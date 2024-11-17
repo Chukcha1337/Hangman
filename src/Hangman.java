@@ -1,3 +1,5 @@
+import org.w3c.dom.ls.LSOutput;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.SQLOutput;
@@ -8,40 +10,12 @@ import java.util.Scanner;
 public class Hangman {
 
     public static void main(String[] args) throws FileNotFoundException {
-        String hiddenWord = null;
+
+        String chosenWord = null;
+
+
         // Цикл для выбора подходящего слова из файла
-        CHOOSINESS:
-        while (true) {
 
-            Random random = new Random();
-            Scanner scanner = new Scanner(new File("dictionary.txt"));
-
-            int wordNumber = random.nextInt(67774);
-
-
-            for (int i = 0; i < wordNumber; i++)
-                if (scanner.hasNext())
-                    hiddenWord = scanner.nextLine();
-                else continue CHOOSINESS;
-
-            System.out.println(wordNumber);
-            System.out.println(hiddenWord);
-
-            char[] check = hiddenWord.toCharArray();
-
-            boolean forbiddenChars = false;
-            for (char c : check)
-                if (c == ' ' || c == '-')
-                    forbiddenChars = true;
-
-            if (check.length < 10 || forbiddenChars)
-                continue CHOOSINESS;
-            else
-                System.out.println(check.length);
-            System.out.println(Arrays.toString(check));
-            scanner.close();
-            break;
-        }
 
         GAME:
         while (true) {
@@ -52,7 +26,7 @@ public class Hangman {
             while (true) {
                 System.out.println("    Хотите начать новую игру? \n (Д) - Новая игра   (Н) - Выход");
                 String decision = scannerOfChoice.nextLine().toUpperCase();
-                System.out.println(decision);
+
 
                 if (decision.equals("Д"))
                     break CHOICE;
@@ -62,9 +36,35 @@ public class Hangman {
                     System.out.println("Уважаемый пользователь, пожалуйста, введите только Д либо Н");
                 continue GAME;
             }
+            CHOOSINESS:
+            while (true) {
+
+                Random random = new Random();
+                Scanner scanner = new Scanner(new File("dictionary.txt"));
+
+                int wordNumber = random.nextInt(67774);
 
 
+                for (int i = 0; i < wordNumber; i++)
+                    if (scanner.hasNext())
+                        chosenWord = scanner.nextLine();
+                    else continue CHOOSINESS;
 
+
+                char[] check = chosenWord.toCharArray();
+
+                boolean forbiddenChars = false;
+                for (char c : check)
+                    if (c == ' ' || c == '-')
+                        forbiddenChars = true;
+
+                if (check.length < 5 || forbiddenChars)
+                    continue;
+                else
+
+                scanner.close();
+                break;
+            }
 
 //
 //            System.out.println("Выберите уровень сложности \n (1) - легкий   (2) - средний   (3) - тяжелый");
@@ -83,45 +83,169 @@ public class Hangman {
 //                    System.out.println("Уважаемый пользователь, пожалуйста, введите только Д либо Н");
 //                continue GAME;
 //            }
-            System.out.println(hiddenWord);
-            char[] wordAsChars = hiddenWord.toCharArray();
+
+            String chosenWordUpperCase = chosenWord.toUpperCase();
+
+            char[] wordAsChars = chosenWordUpperCase.toCharArray();
+
+            char[] hiddenWord = new char[wordAsChars.length];
+            System.out.println("В загаданном слове "+ wordAsChars.length + " букв" );
+            System.out.println(chosenWordUpperCase);
+            for (int i = 0; i < hiddenWord.length; i++) {
+                hiddenWord[i] = '*';
+                System.out.print(hiddenWord[i]+ " ");
+            }
+            System.out.println();
+            char letter = '-';
+            int counterOfMistakes = 0;
+            int maximumMistakes = 8;
+            char[] mistakes = new char[maximumMistakes];
+            for (int k = 0; k < mistakes.length; k++)
+                mistakes[k] = '1';
 
 
-
-            char letter = '*';
-
-
-
+            CURRENT_GAME:
             while (true) {
 
-                System.out.println("Введите букву русского алфавита");
-                String letterInput = scannerOfChoice.nextLine().toUpperCase();
+
+// Ввод буквы русского алфавита
+                LETTER:
+                while (true) {
+
+                    System.out.println("Введите букву русского алфавита");
+                    String letterInput = scannerOfChoice.nextLine().toUpperCase();
 
 
-                if (!letterInput.isEmpty() )
-                    letter = letterInput.charAt(0);
-                else
-                    System.out.println("Вы ничего не ввели");
+                    if (!letterInput.isEmpty())
+                        letter = letterInput.charAt(0);
+                    else
+                        System.out.println("Вы ничего не ввели");
 
-                if (letter >= 'А' && letter <= 'Я' || letter == 'Ё')
-                break;
-                else
-                    System.out.println("Вы ввели не букву, попробуйте еще раз");
-                continue;
+                    for (int j = 0; j < mistakes.length; j++) {
+                        if (mistakes[j] == letter) {
+                            System.out.println("Вы уже вводили эту букву");
+                            continue LETTER;
+
+                        }
+                    }
+                    for (int j = 0; j < hiddenWord.length; j++) {
+                        if (hiddenWord[j] == letter) {
+                            System.out.println("Вы уже вводили эту букву");
+                            continue LETTER;
+
+                        }
+                    }
+                    if (letter >= 'А' && letter <= 'Я' || letter == 'Ё')
+                        break;
+                    else
+                        System.out.println("Вы ввели не букву, попробуйте еще раз");
+
+
+                }
+                for (int q = 0; q < 30; q++) {
+                    System.out.println();
+                }
+
+
+                for (int i = 0; i < wordAsChars.length; i++) {
+                    if (wordAsChars[i] == letter)
+                        hiddenWord[i] = letter;
+                }
+
+                for (int i = 0; i < wordAsChars.length; i++) {
+                    if (wordAsChars[i] != letter) ;
+                    else {
+                        System.out.print("Вы угадали букву! Искомое слово: ");
+
+                        for (char c : hiddenWord) {
+                            System.out.print(c + " ");
+                        }
+                        System.out.println();
+                        System.out.print("Неправильные буквы: ");
+                        for (int j = 0; j < mistakes.length; j++) {
+                            if (mistakes[j] != '1') {
+                                System.out.print(mistakes[j] + " ");
+                            }
+                        }
+                        System.out.println();
+                        Scanner painting = new Scanner(new File("hang.txt"));
+                        for (int t = 0; t <= ((counterOfMistakes - 1) * 10 + 10); t++) {
+                            if (painting.hasNext())
+                                painting.nextLine();
+                        }
+                        for (int w = 0; w < 10; w++) {
+                            if (painting.hasNext())
+                                System.out.println(painting.nextLine());
+                        }
+
+
+                        WINCONDITION:
+                        while (true) {
+                            for (char value : hiddenWord) {
+                                if (value == '*')
+                                    break WINCONDITION;
+                            }
+                            System.out.println();
+                            System.out.print("Поздравляю, Вы выиграли! Искомое слово: ");
+                            for (char c : hiddenWord) {
+                                System.out.print(c + " ");
+                            }
+                            System.out.println();
+                            continue GAME;
+
+                        }
+
+
+                        continue CURRENT_GAME;
+                    }
+
+                }
+
+                counterOfMistakes++;
+                System.out.println("Увы, Вы ошиблись. Количество допущенных ошибок: " + counterOfMistakes);
+                mistakes[counterOfMistakes - 1] = letter;
+                System.out.print("Неправильные буквы: ");
+                for (int j = 0; j < mistakes.length; j++) {
+                    if (mistakes[j] != '1') {
+                        System.out.print(mistakes[j] + " ");
+                    }
+                }
+                System.out.println();
+                for (char c : hiddenWord) {
+                    System.out.print(c + " ");
+                }
+
+                System.out.println();
+
+                Scanner painting = new Scanner(new File("hang.txt"));
+                for (int t = 0; t <= ((counterOfMistakes - 1) * 10 + 10); t++) {
+                    if (painting.hasNext())
+                        painting.nextLine();
+                }
+                for (int w = 0; w < 10; w++) {
+                    if (painting.hasNext())
+                        System.out.println(painting.nextLine());
+                }
+
+
+
+                if (counterOfMistakes == maximumMistakes) {
+                    System.out.println("Вы проиграли");
+                    System.out.println("Искомое слово: " + chosenWordUpperCase);
+                    continue GAME;
+                }
+
+
             }
-
-
-            System.out.println(letter);
-            System.out.println(letter);
-
-
-
-            break GAME;
         }
 
     }
 
 }
+
+
+
+
 
 
 
