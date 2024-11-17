@@ -112,6 +112,8 @@ public class Hangman {
 
 
             System.out.println(letter);
+            System.out.println(letter);
+
 
 
             break GAME;
