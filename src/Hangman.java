@@ -106,13 +106,16 @@ public class Hangman {
                 LETTER:
                 while (true) {
 
-                    System.out.println("Введите букву русского алфавита");
+                    System.out.println("Введите букву русского алфавита \nЕсли хотите выйти из текущей игры, введите (1)");
                     String letterInput = scannerOfChoice.nextLine().toUpperCase();
 
                     if (!letterInput.isEmpty())
                         letter = letterInput.charAt(0);
                     else
                         System.out.println("Вы ничего не ввели");
+
+                    if (letter == '1')
+                        continue GAME;
 
                     for (char mistake : mistakes) {
                         if (mistake == letter) {
